@@ -7,6 +7,7 @@ Studying React
 First I need to install Redux:
 
 ### `npm install --save react-redux`
+
 ### `npm install --save redux`
 
 Now I need to understand, 4 things:
@@ -19,9 +20,9 @@ Now I need to understand, 4 things:
 
 - DISPATCH: this is how I can execute my action.
 
-Here I'll do something super basic, because It's been hard to me to understand.
+Here I'll do something super basic, because It's been hard to me,understand react-redux.
 
-Will be a counter. Explain my project
+This project will be a counter. Every time I click in my button will call a action that will speak with my reducer and then will send to my dispatch and then It will show in my screen.
 
 In my index.js I need to import my store:
 
@@ -74,23 +75,64 @@ DISPATCH
 store.dispatch(increment());
 ```
 
-With this example every time, that I call my method with .dispatch in my console I can that it is working well.
+With this example every time, that I call my method with '.dispatch' in my console I can see that it's working well.
 
 But if my project is big, I can create multiples directories and I need to create another file, that will be where I'll save all of my reducers import togethers and 1 more thing i need to import combineReducers.
 
-### `import { combineReducers } from 'redux'`
+In this example I created 2 directories.
+
+- reducers and actions (self explanatory).
+
+Now I have 3 files in my reducers folder:
+
+- counter.js :
+
+```javascript
+const counterReducer = (state = 0, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return state + 1;
+    case 'DECREMENT':
+      return state - 1;
+  }
+};
+
+export default counterReducer;
+```
+
+- isLogged.js
+
+```javascript
+const loggedReducer = (state = false, action) => {
+  switch (action.type) {
+    case 'SIGN_IN':
+      return !state;
+  }
+};
+
+export default loggedReducer;
+```
+
+- index.js
+
+```javascript
+import { combineReducers } from 'redux';
+import loggedReducer from './isLogged';
+import counterReducer from './counter';
+```
 
 Now I create a function like:
 
 ```javascript
 const allReducers = combineReducers({
-	NameOfMyReducer: NameOfMyReducer,
-	LoginReducer: LoginReducer,
-	Etc: Etc
-})
+  counterReducer: counterReducer,
+  loggedReducer: loggedReducer
+});
+
+export default allReducers;
 ```
 
-Now I back to mye index.js and import this new file and inside of my createStore() put my allReducers, exemple:
+Now I back to mye index.js in my main root and import this new file and inside of my createStore() put my allReducers, exemple:
 
 `import allReducer from './reducers';`
 
@@ -102,79 +144,162 @@ And now I'll import my Provider from react-redux and wrape my app with the provi
 
 ```javascript
 ReactDOM.render(
-        <Provider store={store}>
-            <App />
-        </Provider>
-        , document.getElementById('root'));
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
 ```
 
-===================================================================================
+To see everything working well, I need to install one dev-tool from [React Redux Dev Tool](https://addons.mozilla.org/pt-BR/firefox/addon/reduxdevtools/), and `window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()`
+now this piece of code i need to put inside my createStore, like this:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+```javascript
+const store = createStore(
+  allReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
+```
 
-## Available Scripts
+When I press F12 in Redux, in Tree I can see the actual state of my reducers and check if everything is working well.
 
-In the project directory, you can run:
+Now It's time to display my counter in my screen!!
 
-### `npm start`
+Open the file App.js
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+`import { useSelector } from 'react-redux'`
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+I need to create a variable to save use my counter or my login reducers here:
 
-### `npm test`
+```javascript
+const counterReducer = useSelector(state => state.counterReducer);
+const loggedReducer = useSelector(state => state.loggedReducer);
+```
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Then I can only display the state:
 
-### `npm run build`
+`<h2>Counter: {counterReducer}</h2>`
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Or I can do some validations like:
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+#### Important: (?) is my if and (:) is my else
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```javascript
+{
+  loggedReducer ? (
+    <h4>I'm logged / state = true</h4>
+  ) : (
+    <h4>I'm not logged / state = false</h4>
+  );
+}
+```
 
-### `npm run eject`
+Here is my full function:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```javascript
+function App() {
+  const counterReducer = useSelector(state => state.counterReducer);
+  const loggedReducer = useSelector(state => state.loggedReducer);
+  return (
+    <div className='App'>
+      <div>
+        <h1>Learning React Redux</h1>
+        <h2>Counter: {counterReducer}</h2>
+        {loggedReducer ? (
+          <h4>I'm logged / state = true</h4>
+        ) : (
+          <h4>I'm not logged / state = false</h4>
+        )}
+      </div>
+    </div>
+  );
+}
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+export default App;
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Now I wanna to put some buttons to click and change the state of my reducers.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Create a button on App.js
+- In my action folder, create a file index.js
 
-## Learn More
+Now I will create some actions, to change the state of my reducers and send a new value to my dispatch and then change the value in my screen. Simple like that:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```javascript
+export const incremente = () => {
+  return {
+    type: 'INCREMENT'
+  };
+};
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+export const decrement = () => {
+  return {
+    type: 'DECREMENT'
+  };
+};
+```
 
-### Code Splitting
+Back to App.js and import my actions and useDispatch self explanatory:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+```javascript
+import { useSelector, useDispatch } from 'react-redux';
+import { increment, decrement } from './actions';
+```
 
-### Analyzing the Bundle Size
+Now create a variable inside mey function App, like:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+`const dispatch = useDispatch();`
 
-### Making a Progressive Web App
+Then I can use it with a call back onClick:
+`<button onClick={() => dispatch(increment())}>+</button>`
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+But if a wanna increment by 5 in 5 or do some calc, how can i do?
 
-### Advanced Configuration
+Easy, just back to actions folder and open the file, index.js
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+```javascript
+export const incrementFive = number => {
+  return {
+    type: 'INCREMENTFIVE',
+    payload: number
+  };
+};
+```
 
-### Deployment
+Now in my reducer add a new case:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+```javascript
+case 'INCREMENTFIVE':
+      return state + action.payload;
+```
 
-### `npm run build` fails to minify
+Back to my App.js and create a new button and pass 5 in the paramenter:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+`<button onClick={() => dispatch(incrementFive(5))}>5+</button>`
+
+If I need to implement something BOOLEAN no needs to create 2 actions like return true and return false, I simply can use return !state, that means the reverse of the original state, example:
+
+My reducer:
+
+```javascript
+const loggedReducer = (state = true, action) => {
+  switch (action.type) {
+    case 'SIGN_IN':
+      return !state;
+    default:
+      return state;
+  }
+};
+
+export default loggedReducer;
+```
+
+My action:
+
+```javascript
+export const login = () => {
+  return {
+    type: 'SIGN_IN'
+  };
+};
+```

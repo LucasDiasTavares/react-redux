@@ -4,41 +4,54 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { createStore } from 'redux';
+import allReducer from './reducers';
+import { Provider } from 'react-redux';
 
-//STORE
+const store = createStore(
+  allReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
 
-//ACTION
-const increment = () => {
-  return {
-    type: 'INCREMENT'
-  };
-};
+// Old example
+// //STORE
 
-const decrement = () => {
-  return {
-    type: 'DECREMENT'
-  };
-};
+// //ACTION
+// const increment = () => {
+//   return {
+//     type: 'INCREMENT'
+//   };
+// };
 
-//REDUCER
-const counter = (state = 0, action) => {
-  switch (action.type) {
-    case 'INCREMENT':
-      return state + 1;
-    case 'DECREMENT':
-      return state - 1;
-  }
-};
+// const decrement = () => {
+//   return {
+//     type: 'DECREMENT'
+//   };
+// };
 
-let store = createStore(counter);
+// //REDUCER
+// const counter = (state = 0, action) => {
+//   switch (action.type) {
+//     case 'INCREMENT':
+//       return state + 1;
+//     case 'DECREMENT':
+//       return state - 1;
+//   }
+// };
 
-//Displaying at console
-store.subscribe(() => console.log(store.getState()));
+// let store = createStore(counter);
 
-//DISPATCH
-store.dispatch(increment());
+// //Displaying at console
+// store.subscribe(() => console.log(store.getState()));
 
-ReactDOM.render(<App />, document.getElementById('root'));
+// //DISPATCH
+// store.dispatch(increment());
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
